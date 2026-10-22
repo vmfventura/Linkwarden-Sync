@@ -1,6 +1,6 @@
 # Installation and usage
 
-Linkwarden Sync 0.1.0 is a preview. Chrome Web Store and Firefox Add-ons downloads are not available yet. You can build the source and load it locally.
+Linkwarden Sync is a preview. Chrome Web Store and Firefox Add-ons downloads are not available yet. You can build the source or download an available GitHub release and load it locally.
 
 ## Requirements
 
@@ -28,6 +28,10 @@ npm run build:firefox
 ## Download a GitHub Actions build
 
 When the project is hosted on GitHub with Actions enabled, successful **Build extension packages** runs provide separate Chromium and Firefox artifacts for seven days. Open the run under **Actions**, download the required artifact and extract it to obtain the extension ZIP and SHA-256 checksum file. Extract that ZIP into a folder, then use the loading instructions below with that folder. These are unsigned test packages; they are not store installations. See [automatic builds](PUBLISHING.md#automatic-builds-on-github-actions) for the artifact names and scope.
+
+## Download a GitHub release
+
+Open the repository's **Releases** page and select an available pre-release. Under **Assets**, download the `chrome.zip` or `firefox.zip` package for your browser and its matching `SHA256SUMS.txt` file. The filenames also include the version. Verify the checksum, then extract the ZIP to a folder and use the loading instructions below, selecting that folder instead of `.output`. Firefox packages are unsigned and require temporary installation. The sources ZIP is for reviewing or rebuilding the extension.
 
 ## Load in Chromium
 

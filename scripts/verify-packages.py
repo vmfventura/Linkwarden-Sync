@@ -26,7 +26,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def metadata():
+def metadata(tag=None):
     package = json.loads((ROOT / 'package.json').read_text())
     locked = json.loads((ROOT / 'package-lock.json').read_text())['packages']['']
     require(package['name'] == locked['name'] == NAME, 'Project names do not match.')
@@ -37,6 +37,8 @@ def metadata():
     require(any(parts) and all(part <= 65535 for part in parts), 'Version numbers must fit browser manifest limits.')
     require(locked['version'] == version, 'Update the root lockfile version with package.json.')
     require(package['license'] == locked['license'] == 'GPL-3.0-or-later', 'License metadata does not match.')
+    if tag is not None:
+        require(tag == f'v{version}', 'Tag must be v followed by the exact package.json version.')
     return version
 
 
@@ -94,9 +96,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('browser', nargs='?', choices=('chrome', 'firefox'))
     parser.add_argument('--print-version', action='store_true')
+    parser.add_argument('--tag', help='Require this tag to match the project version.')
     args = parser.parse_args()
     require(bool(args.browser) != args.print_version, 'Choose a browser or --print-version.')
-    version = metadata()
+    version = metadata(args.tag)
     if args.print_version:
         print(version)
         return

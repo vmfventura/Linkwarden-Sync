@@ -44,7 +44,8 @@ export default defineConfig({
     includeSources: [
       'package.json', 'package-lock.json', 'tsconfig.json', 'wxt.config.ts', 'vitest.config.ts',
       'entrypoints/**', 'src/**', 'public/**', 'tests/**', 'scripts/**', 'demo/**',
-      'LICENSE', 'THIRD_PARTY_NOTICES.txt', 'README.md', 'PRIVACY.md', 'SECURITY.md', 'docs/**',
+      'LICENSE', 'THIRD_PARTY_NOTICES.txt', 'README.md', 'PRIVACY.md', 'SECURITY.md',
+      'docs/GETTING_STARTED.md', 'docs/PUBLISHING.md', 'docs/media/**',
     ],
     excludeSources: ['demo/dist/**'],
   },

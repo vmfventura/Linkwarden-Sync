@@ -30,7 +30,7 @@ The current Firefox identifier is `linkwarden-sync@linkwarden-sync.local`. Confi
 
 ## Automatic builds on GitHub Actions
 
-The [build workflow](../.github/workflows/build.yml) runs on pull requests, pushes to `main`, and manual **Run workflow** requests. It checks types and runs unit tests before building the Chromium and Firefox variants in separate jobs, using Node.js 24 and the lockfile. Both manifests inherit the version from `package.json`; update the root version in `package-lock.json` alongside it. Browser package versions currently use numeric `major.minor.patch` values.
+The [build workflow](../.github/workflows/build.yml) runs on pull requests, pushes to `main`, new `v*` tag pushes, and manual **Run workflow** requests. It checks types and runs unit tests before building the Chromium and Firefox variants in separate jobs, using Node.js 24 and the lockfile. Both manifests inherit the version from `package.json`; update the root version in `package-lock.json` alongside it. Browser package versions use numeric `major.minor.patch` values. A tag must be exactly `v` followed by that version; a mismatch fails before building.
 
 After a successful run, open **Actions → Build extension packages → the run → Artifacts**. Download the required artifact:
 
@@ -42,9 +42,34 @@ After a successful run, open **Actions → Build extension packages → the run 
 
 Artifacts are retained for seven days. Unpack the downloaded artifact to find the extension ZIP. To load it locally, follow the [installation guide](GETTING_STARTED.md); Firefox still requires temporary loading until a signed release is available. The workflow checks archive layout, manifest versions, permissions, translations, license notices and accidental inclusion of common local/generated files. It does not run browser smoke checks or validate a live Linkwarden instance.
 
-Builds need no Linkwarden token, signing key or store credentials. The workflow uses a read-only repository token, disables persisted checkout credentials and package-manager caching, and pins third-party actions to commit hashes. It does not sign extensions, create GitHub Releases, or publish to either store. Check the final package and complete the distribution requirements below before publishing it.
+Builds need no Linkwarden token, signing key or store credentials. Checks and builds use read-only repository permissions. The workflow disables persisted checkout credentials and package-manager caching, and pins third-party actions to commit hashes. It does not sign extensions or publish to either store. Check the final package and complete the distribution requirements below before store submission.
 
 See GitHub's [artifact documentation](https://docs.github.com/actions/using-workflows/storing-workflow-data-as-artifacts) and [workflow security guidance](https://docs.github.com/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions).
+
+## Publish a GitHub pre-release with a tag
+
+A new version tag push automatically publishes a **GitHub pre-release** after all checks and both browser builds succeed. Releases remain previews and are not marked as the latest stable release. Pull requests, branch pushes and manual workflow runs only build artifacts.
+
+For example, to prepare version `0.1.1` from `0.1.0`:
+
+```sh
+npm version patch --no-git-tag-version
+```
+
+Review and commit the resulting `package.json` and `package-lock.json` changes together with any release changes, then push that commit. From the same commit, create and push the matching tag (replace `<remote>` with your Git remote name):
+
+```sh
+git tag -a v0.1.1 -m "Preview v0.1.1"
+git push <remote> v0.1.1
+```
+
+The tagged commit must contain this workflow. Tags created before the workflow was added do not trigger it retroactively; pushing an unchanged existing tag does not create a new event. Use a new version for the next release, and do not move or reuse published tags.
+
+The release job downloads the three exact artifacts from its own run. It checks that all six files are present, verifies their checksums and archive contents, and confirms that the remote tag still resolves to the tested commit immediately before publication. That final check cannot prevent someone forcibly moving the tag during publication; keep release tags protected against changes in the repository settings.
+
+Only this final job receives `contents: write`, through GitHub's built-in workflow token. No personal access token is required. It uploads the Chromium ZIP, unsigned Firefox ZIP and review source ZIP, each with its checksum file. Existing releases and drafts for that tag are rejected rather than overwritten. If publication fails, inspect **Actions** and **Releases**, including drafts, before retrying; a failed upload may have left a draft.
+
+Download the six files directly from **Releases → the version → Assets**. Unlike Actions artifacts, release assets are not subject to the workflow's seven-day artifact retention. These packages still require the [local installation steps](GETTING_STARTED.md); a GitHub release does not replace store signing or review. See GitHub's [release documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
 
 ## Chrome Web Store
 
