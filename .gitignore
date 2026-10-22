@@ -1,0 +1,32 @@
+node_modules/
+.output/
+.wxt/
+coverage/
+test-results/
+.env
+.env.*
+!.env.example
+*.log
+*.zip
+*.xpi
+*.pem
+*.key
+.profiles/
+artifacts/
+
+demo/dist/
+
+# Local editor, OS and compiler files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# Private certificate/key containers
+*.p12
+*.pfx
